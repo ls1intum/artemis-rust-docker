@@ -1,5 +1,9 @@
 FROM rust:1.78
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  jq \
+  && rm -rf /var/lib/apt/lists/*
+
 # cargo clippy
 RUN rustup component add clippy
 
