@@ -11,4 +11,17 @@ RUN rustup component add clippy
 RUN curl -LsSf https://get.nexte.st/0.9.70/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
 
 # clippy-sarif
-RUN cargo install clippy-sarif@0.7.0
+RUN cargo install --locked clippy-sarif@0.7.0
+
+# sccache
+RUN cargo install --locked --no-default-features sccache@0.10.0
+ENV RUSTC_WRAPPER=sccache
+
+WORKDIR /usr/src/artemis-test
+ENV CARGO_INCREMENTAL=false
+
+# build and cache common dependencies
+COPY test .
+RUN cargo build --tests --profile test && find . -delete
+
+ENV SCCACHE_LOCAL_RW_MODE=READ_ONLY
